@@ -8,45 +8,26 @@
  * curl http://localhost:8080/
  * curl --data "users=yifan,yifan2" http://localhost:8080/import
  * curl http://localhost:8080/lucky
- * @author 一凡Sir
  */
 
 package main
 
 import (
 	"fmt"
+	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/mvc"
 	"math/rand"
 	"strings"
 	"time"
-
-	"github.com/kataras/iris/v12"
-	"github.com/kataras/iris/v12/mvc"
 )
 
-var userList []string
+var userList []string // var userList → 相当于Spring中的单例Bean（但Go的全局变量需要特别注意并发安全）
 
-func newApp() *iris.Application {
-	app := iris.New()
-	mvc.New(app.Party("/")).Handle(&lotteryController{})
-	return app
+type lotteryController struct { // 抽奖的控制器（类似@RestController）
+	Ctx iris.Context // 依赖注入请求上下文（类似Spring的@Autowired HttpServletRequest）
 }
 
-func main() {
-	app := newApp()
-
-	userList = make([]string, 0)
-
-	// http://localhost:8080
-	app.Run(iris.Addr(":8080"))
-}
-
-// 抽奖的控制器
-type lotteryController struct {
-	Ctx iris.Context
-}
-
-// GET http://localhost:8080/
-func (c *lotteryController) Get() string {
+func (c *lotteryController) Get() string { // GET http://localhost:8080/ （等效@GetMapping）
 	count := len(userList)
 	return fmt.Sprintf("当前总共参与抽奖的用户数: %d\n", count)
 }
@@ -84,4 +65,18 @@ func (c *lotteryController) GetLucky() string {
 		return fmt.Sprintf("已经没有参与用户，请先通过 /import 导入用户 \n")
 	}
 
+}
+
+func newApp() *iris.Application { // newApp() → 类似@SpringBootApplication配置类
+	app := iris.New()
+	mvc.New(app.Party("/")).Handle(&lotteryController{}) // mvc.New() → 类似Spring MVC的@Controller自动扫描
+	return app
+}
+
+func main() {
+	app := newApp()
+
+	userList = make([]string, 0)
+
+	app.Run(iris.Addr(":8080"))
 }
