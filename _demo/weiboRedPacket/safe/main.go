@@ -29,6 +29,8 @@ var logger *log.Logger
 // 当前有效红包列表，int64是红包唯一ID，[]uint是红包里面随机分到的金额（单位分）
 // var packageList map[uint32][]uint = make(map[uint32][]uint)
 var packageList *sync.Map = new(sync.Map)
+
+// 定义了一个传递 task 结构体的无缓冲通道（默认容量为 0）。向此通道发送数据时，必须有另一个协程（goroutine）准备好接收，否则会阻塞。
 var chTasks chan task = make(chan task)
 
 func main() {
@@ -95,7 +97,7 @@ func fetchPackageMoney() {
 // 任务结构
 type task struct {
 	id       uint32
-	callback chan uint
+	callback chan uint // callback 是一个无缓冲的 chan uint 通道，用于接收任务处理完成后的结果或状态。例如，工作协程处理完任务后，可以通过此通道向调用方返回结果
 }
 
 // 抽奖的控制器
