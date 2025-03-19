@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/kataras/iris/v12"
+	"learnLottery/comm"
 	"learnLottery/models"
 	"learnLottery/services"
 )
@@ -37,4 +39,32 @@ func (c *IndexController) GetGifts() map[string]interface{} {
 	}
 	rs["gifts"] = list
 	return rs
+}
+
+// 登录 GET /login
+func (c *IndexController) GetLogin() {
+	// 每次随机生成一个登录用户信息
+	uid := comm.Random(100000)
+	loginuser := models.ObjLoginuser{
+		Uid:      uid,
+		Username: fmt.Sprintf("admin-%d", uid),
+		Now:      comm.NowUnix(),
+		Ip:       comm.ClientIP(c.Ctx.Request()),
+	}
+	refer := c.Ctx.GetHeader("Referer")
+	if refer == "" {
+		refer = "/public/index.html?from=login"
+	}
+	comm.SetLoginuser(c.Ctx.ResponseWriter(), &loginuser)
+	comm.Redirect(c.Ctx.ResponseWriter(), refer)
+}
+
+// 退出 GET /logout
+func (c *IndexController) GetLogout() {
+	refer := c.Ctx.GetHeader("Referer")
+	if refer == "" {
+		refer = "/public/index.html?from=logout"
+	}
+	comm.SetLoginuser(c.Ctx.ResponseWriter(), nil)
+	comm.Redirect(c.Ctx.ResponseWriter(), refer)
 }
