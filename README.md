@@ -28,4 +28,5 @@ go get github.com/microcosm-cc/bluemonday@v1.0.26
 ### datasource
 ```shell
 go get github.com/go-xorm/cmd/xorm
+go get github.com/gomodule/redigo/redis
 ```

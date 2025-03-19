@@ -1,5 +1,7 @@
 package conf
 
+const DriverName = "mysql"
+
 type DbConfig struct {
 	Host      string
 	Port      int
