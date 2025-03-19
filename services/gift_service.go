@@ -6,6 +6,7 @@ import (
 )
 
 type GiftService interface {
+	GetAll(useCache bool) []models.LtGift
 	CountAll() int64
 	Get(id int) *models.LtGift
 	Delete(id int) error
@@ -15,6 +16,11 @@ type GiftService interface {
 
 type giftService struct {
 	dao *dao.GiftDao
+}
+
+func (s *giftService) GetAll(useCache bool) []models.LtGift {
+	// 直接读取数据库的方式
+	return s.dao.GetAll()
 }
 
 func (s *giftService) CountAll() int64 {

@@ -4,6 +4,7 @@ import (
 	iris "github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/logger"
 	"github.com/kataras/iris/v12/middleware/recover"
+	"io/ioutil"
 	"learnLottery/conf"
 	"time"
 )
@@ -97,6 +98,15 @@ func (b *Bootstrapper) Bootstrap() *Bootstrapper {
 
 	// static files
 	b.Favicon(StaticAssets + Favicon)
+	// 替换 b.StaticWeb(StaticAssets[1:], StaticAssets)
+	b.HandleDir(StaticAssets[1:], iris.Dir(StaticAssets))
+	indexHtml, err := ioutil.ReadFile(StaticAssets + "/index.html")
+	if err == nil {
+		b.StaticContent(StaticAssets[1:]+"/", "text/html",
+			indexHtml)
+	}
+	// 不要把目录末尾"/"省略掉
+	iris.WithoutPathCorrectionRedirection(b.Application)
 
 	// crontab
 	b.setupCron()

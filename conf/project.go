@@ -14,3 +14,6 @@ var SignSecret = []byte("0123456789abcdef")
 
 // cookie中的加密验证密钥
 var CookieSecret = "hellolottery"
+
+// 是否需要启动全局计划任务服务
+var RunningCrontabService = false
